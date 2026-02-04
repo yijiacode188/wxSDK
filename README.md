@@ -9,6 +9,7 @@ go get github.com/yijiacode188/wxSDK
 ```
 
 ## For Example
+公众号测试号 https://mp.weixin.qq.com/debug/cgi-bin/sandboxinfo?action=showinfo&t=sandbox/index
 ```go
     package main
 

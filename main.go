@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	client, err := subscription.NewClient("wx4ec69cbaee743a66", "f5655dae68d660bc58f05a46ce1f91dc")
+	client, err := subscription.NewClient("appId", "secret")
 	if err != nil {
 		panic(err)
 		return
