@@ -16,7 +16,7 @@ type UrlLinkInfo struct {
 type QuotaInfo struct {
 	RemainVisitQuota int `json:"remain_visit_quota" comment:"URL Scheme（加密+明文）/加密 URL Link 单天剩余访问次数"`
 }
-type GetQueryUrlLinkResponse struct {
+type QueryUrlLinkResponse struct {
 	base.Base
 	UrlLinkInfo UrlLinkInfo `json:"url_link_info" comment:"url_link 配置"`
 	QuotaInfo   QuotaInfo   `json:"quota_info" comment:"quota 配置"`

@@ -2,7 +2,7 @@ package vo
 
 import "github.com/yijiacode188/wxSDK/miniprogram/model/vo/base"
 
-type GetCode2SessionResponse struct {
+type Code2SessionResponse struct {
 	base.Base
 	SessionKey string `json:"session_key" comment:"会话秘钥"`
 	UnionId    string `json:"unionid" comment:"用户在开放平台的唯一标识符"`

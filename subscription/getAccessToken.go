@@ -1,20 +1,19 @@
-package miniprogram
+package subscription
 
 import (
 	"errors"
-	"github.com/yijiacode188/wxSDK/miniprogram/model/vo"
+	"github.com/yijiacode188/wxSDK/subscription/model/vo"
 	"github.com/yijiacode188/wxSDK/utils"
 	"net/url"
 	"time"
 )
 
-const ACCESS_TOKEN = "miniprogram_access_token"
+const ACCESS_TOKEN = "subscription_access_token"
 
-// GetAccessToken 获取接口调用凭据
+// getAccessToken 获取接口调用凭据
 // 本接口用于获取获取全局唯一后台接口调用凭据（Access Token），token 有效期为 7200 秒，开发者需要进行妥善保存，使用注意事项请参考此文档。
-// https://developers.weixin.qq.com/miniprogram/dev/server/API/mp-access-token/api_getaccesstoken.html
-func (wx *wxClient) GetAccessToken() (string, error) {
-
+// https://developers.weixin.qq.com/doc/subscription/api/base/api_getaccesstoken.html
+func (wx *wxClient) getAccessToken() (string, error) {
 	token, ok := wx.Store.GetStore(ACCESS_TOKEN)
 	if ok {
 		return token.(string), nil
@@ -33,7 +32,7 @@ func (wx *wxClient) GetAccessToken() (string, error) {
 	if result.ErrCode != 0 {
 		return "", errors.New(result.ErrMsg)
 	}
-	err = wx.Store.SetStore(ACCESS_TOKEN, result.AccessToken, time.Now().Add(time.Duration(result.ExpiresIn)*time.Second))
+	err = wx.Store.SetStore(ACCESS_TOKEN, result.AccessToken, time.Now().Add(time.Duration(result.ExpiresIn-10)*time.Second))
 	if err != nil {
 		return "", err
 	}

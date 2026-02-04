@@ -12,7 +12,7 @@ import (
 // 该接口用于获取小程序码，适用于需要的码数量极多的业务场景。通过该接口生成的小程序码，永久有效，数量暂无限制。 更多用法详见 获取小程序码。
 // https://developers.weixin.qq.com/miniprogram/dev/server/API/qrcode-link/qr-code/api_getunlimitedqrcode.html
 func (wx *wxClient) GetUnlimitedQRCode(body *dto.GetUnlimitedQRCodeRequest) ([]byte, error) {
-	token, err := wx.getAccessToken()
+	token, err := wx.GetStableAccessToken(false)
 	if err != nil {
 		return nil, err
 	}

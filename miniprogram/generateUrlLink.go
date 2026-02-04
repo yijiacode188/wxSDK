@@ -8,17 +8,17 @@ import (
 	"net/url"
 )
 
-// GetGenerateUrlLink 获取加密URLLink
+// GenerateUrlLink 获取加密URLLink
 // 获取小程序 URL Link，适用于短信、邮件、网页、微信内等拉起小程序的业务场景。目前仅针对国内非个人主体的小程序开放，详见获取 URL Link
 // https://developers.weixin.qq.com/miniprogram/dev/server/API/qrcode-link/url-link/api_generateurllink.html
-func (wx *wxClient) GetGenerateUrlLink(body *dto.GetGenerateUrlLinkRequest) (string, error) {
-	token, err := wx.getAccessToken()
+func (wx *wxClient) GenerateUrlLink(body *dto.GenerateUrlLinkRequest) (string, error) {
+	token, err := wx.GetStableAccessToken(false)
 	if err != nil {
 		return "", err
 	}
 	params := make(url.Values)
 	params.Add("access_token", token)
-	result, _, err := utils.HttpPost[vo.GetGenerateUrlLinkResponse](&utils.RequestParams{
+	result, _, err := utils.HttpPost[vo.GenerateUrlLinkResponse](&utils.RequestParams{
 		Url:    "https://api.weixin.qq.com/wxa/generate_urllink",
 		Params: params,
 		Body:   body.ToByte(),

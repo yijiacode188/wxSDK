@@ -8,11 +8,11 @@ import (
 	"net/url"
 )
 
-// GetCreateQRCode 获取小程序二维码
+// CreateQRCode 获取小程序二维码
 // 获取小程序二维码，适用于需要的码数量较少的业务场景。通过该接口生成的小程序码，永久有效，有数量限制，详见获取二维码。
 // https://developers.weixin.qq.com/miniprogram/dev/server/API/qrcode-link/qr-code/api_createqrcode.html
-func (wx *wxClient) GetCreateQRCode(body *dto.GetCreateQRCodeRequest) ([]byte, error) {
-	token, err := wx.getAccessToken()
+func (wx *wxClient) CreateQRCode(body *dto.CreateQRCodeRequest) ([]byte, error) {
+	token, err := wx.GetStableAccessToken(false)
 	if err != nil {
 		return nil, err
 	}

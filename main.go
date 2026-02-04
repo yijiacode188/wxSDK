@@ -2,19 +2,23 @@ package main
 
 import (
 	"fmt"
-	"github.com/yijiacode188/wxSDK/miniprogram"
+	"github.com/yijiacode188/wxSDK/subscription"
+	"github.com/yijiacode188/wxSDK/subscription/model/dto"
 )
 
 func main() {
-	client, err := miniprogram.NewClient("appId", "secret")
+	client, err := subscription.NewClient("wx4ec69cbaee743a66", "f5655dae68d660bc58f05a46ce1f91dc")
 	if err != nil {
 		panic(err)
 		return
 	}
-	session, err := client.GetCode2Session("code")
+
+	err = client.ClearApiQuota(&dto.ClearApiQuotaRequest{
+		CgiPath: "/channels/ec/basics/info/get",
+	})
 	if err != nil {
 		panic(err)
 		return
 	}
-	fmt.Println(fmt.Sprintf("openId：%s", session.OpenId))
+	fmt.Println("info")
 }

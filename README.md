@@ -12,7 +12,11 @@ go get github.com/yijiacode188/wxSDK
 ```go
     package main
 
-    import "github.com/yijiacode188/wxSDK/miniprogram"
+    import (
+		"github.com/yijiacode188/wxSDK/miniprogram"
+		"fmt"
+    )
+    
 
     func main()  {
 		client, err := miniprogram.NewClient("appId", "secret")
@@ -20,7 +24,7 @@ go get github.com/yijiacode188/wxSDK
 			panic(err)
 			return
 		}
-		session, err := client.GetCode2Session("code")
+		session, err := client.Code2Session("code")
 		if err != nil {
 			panic(err)
 			return
