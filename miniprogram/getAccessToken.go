@@ -2,10 +2,10 @@ package miniprogram
 
 import (
 	"errors"
+	"github.com/yijiacode188/wxSDK/miniprogram/model/vo"
+	"github.com/yijiacode188/wxSDK/utils"
 	"net/url"
 	"time"
-	"wxSDK/miniprogram/model/vo"
-	"wxSDK/utils"
 )
 
 const ACCESS_TOKEN = "miniprogram_access_token"

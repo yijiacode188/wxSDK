@@ -1,6 +1,6 @@
 package vo
 
-import "wxSDK/miniprogram/model/vo/base"
+import "github.com/yijiacode188/wxSDK/miniprogram/model/vo/base"
 
 type GetPhoneNumberResponse struct {
 	base.Base

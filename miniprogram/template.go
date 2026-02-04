@@ -2,8 +2,8 @@ package miniprogram
 
 import (
 	"errors"
-	"wxSDK/store"
-	"wxSDK/types"
+	"github.com/yijiacode188/wxSDK/store"
+	"github.com/yijiacode188/wxSDK/types"
 )
 
 type wxClient struct {

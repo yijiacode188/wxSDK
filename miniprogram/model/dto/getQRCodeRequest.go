@@ -2,7 +2,7 @@ package dto
 
 import (
 	"encoding/json"
-	"wxSDK/miniprogram/consts"
+	"github.com/yijiacode188/wxSDK/miniprogram/consts"
 )
 
 type LineColor struct {

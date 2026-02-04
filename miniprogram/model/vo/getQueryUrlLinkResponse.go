@@ -1,8 +1,8 @@
 package vo
 
 import (
-	"wxSDK/miniprogram/consts"
-	"wxSDK/miniprogram/model/vo/base"
+	"github.com/yijiacode188/wxSDK/miniprogram/consts"
+	"github.com/yijiacode188/wxSDK/miniprogram/model/vo/base"
 )
 
 type UrlLinkInfo struct {

@@ -2,9 +2,9 @@ package miniprogram
 
 import (
 	"errors"
+	"github.com/yijiacode188/wxSDK/miniprogram/model/vo"
+	"github.com/yijiacode188/wxSDK/utils"
 	"net/url"
-	"wxSDK/miniprogram/model/vo"
-	"wxSDK/utils"
 )
 
 // GetCode2Session 小程序登录凭证校验

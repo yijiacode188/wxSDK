@@ -2,10 +2,10 @@ package miniprogram
 
 import (
 	"errors"
+	"github.com/yijiacode188/wxSDK/miniprogram/model/dto"
+	"github.com/yijiacode188/wxSDK/miniprogram/model/vo"
+	"github.com/yijiacode188/wxSDK/utils"
 	"net/url"
-	"wxSDK/miniprogram/model/dto"
-	"wxSDK/miniprogram/model/vo"
-	"wxSDK/utils"
 )
 
 // GetUnlimitedQRCode 获取不限制的小程序码
