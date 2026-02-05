@@ -15,23 +15,23 @@ import (
 // 使用普通自定义菜单查询接口可以获取默认菜单和全部个性化菜单信息，请见自定义菜单查询接口的说明。
 // 使用普通自定义菜单删除接口可以删除所有自定义菜单（包括默认菜单和全部个性化菜单），请见自定义菜单删除接口的说明。
 // https://developers.weixin.qq.com/doc/subscription/api/custommenu/api_addconditionalmenu.html
-func (wx *wxClient) AddConditionalMenu(body *dto.AddConditionalMenuRequest) (string, error) {
-	token, err := wx.GetStableAccessToken(false)
+func (wx *wxClient) AddConditionalMenu(body *dto.AddConditionalMenuRequest) (string, *utils.Response, error) {
+	token, _, err := wx.GetStableAccessToken(false)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	params := make(url.Values)
 	params.Add("access_token", token)
-	result, _, err := utils.HttpPost[vo.AddConditionalMenuResponse](&utils.RequestParams{
+	result, response, err := utils.HttpPost[vo.AddConditionalMenuResponse](&utils.RequestParams{
 		Url:    "https://api.weixin.qq.com/cgi-bin/menu/addconditional",
 		Params: params,
 		Body:   body.ToByte(),
 	})
 	if err != nil {
-		return "", err
+		return "", response, err
 	}
 	if result.ErrCode != 0 {
-		return "", errors.New(result.ErrMsg)
+		return "", response, errors.New(result.ErrMsg)
 	}
-	return result.MenuId, nil
+	return result.MenuId, response, nil
 }

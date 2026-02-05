@@ -11,23 +11,23 @@ import (
 // CreateCustomMenu 创建自定义菜单
 // 该接口用于创建公众号/服务号的自定义菜单。
 // https://developers.weixin.qq.com/doc/subscription/api/custommenu/api_createcustommenu.html
-func (wx *wxClient) CreateCustomMenu(body *dto.CreateCustomMenuRequest) error {
-	token, err := wx.GetStableAccessToken(false)
+func (wx *wxClient) CreateCustomMenu(body *dto.CreateCustomMenuRequest) (*utils.Response, error) {
+	token, _, err := wx.GetStableAccessToken(false)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	params := make(url.Values)
 	params.Add("access_token", token)
-	result, _, err := utils.HttpPost[vo.CreateCustomMenuResponse](&utils.RequestParams{
+	result, response, err := utils.HttpPost[vo.CreateCustomMenuResponse](&utils.RequestParams{
 		Url:    "https://api.weixin.qq.com/cgi-bin/menu/create",
 		Params: params,
 		Body:   body.ToByte(),
 	})
 	if err != nil {
-		return err
+		return response, err
 	}
 	if result.ErrCode != 0 {
-		return errors.New(result.ErrMsg)
+		return response, errors.New(result.ErrMsg)
 	}
-	return nil
+	return response, nil
 }

@@ -16,29 +16,29 @@ import (
 // 如使用云开发，可通过云调用免维护 access_token 调用；
 // 如使用云托管，也可以通过微信令牌/开放接口服务免维护 access_token 调用；
 // https://developers.weixin.qq.com/doc/subscription/api/base/api_getstableaccesstoken.html
-func (wx *wxClient) GetStableAccessToken(forceRefresh bool) (string, error) {
+func (wx *wxClient) GetStableAccessToken(forceRefresh bool) (string, *utils.Response, error) {
 	token, ok := wx.Store.GetStore(ACCESS_TOKEN)
 	if ok {
-		return token.(string), nil
+		return token.(string), nil, nil
 	}
 	body := &dto.GetStableAccessTokenRequest{
 		AppID:        wx.AppId,
 		Secret:       wx.Secret,
 		ForceRefresh: forceRefresh,
 	}
-	result, _, err := utils.HttpPost[vo.GetStableAccessTokenResponse](&utils.RequestParams{
+	result, response, err := utils.HttpPost[vo.GetStableAccessTokenResponse](&utils.RequestParams{
 		Url:  "https://api.weixin.qq.com/cgi-bin/stable_token",
 		Body: body.ToByte(),
 	})
 	if err != nil {
-		return "", nil
+		return "", response, nil
 	}
 	if result.ErrCode != 0 {
-		return "", errors.New(result.ErrMsg)
+		return "", response, errors.New(result.ErrMsg)
 	}
 	err = wx.Store.SetStore(ACCESS_TOKEN, result.AccessToken, time.Now().Add(time.Duration(result.ExpiresIn-10)*time.Second))
 	if err != nil {
-		return "", err
+		return "", response, err
 	}
-	return result.AccessToken, nil
+	return result.AccessToken, response, nil
 }

@@ -11,10 +11,10 @@ import (
 // GetQRCode 获取小程序码
 // 该接口用于获取小程序码，适用于需要的码数量较少的业务场景。通过该接口生成的小程序码，永久有效，有数量限制，详见获取小程序码。
 // https://developers.weixin.qq.com/miniprogram/dev/server/API/qrcode-link/qr-code/api_getqrcode.html
-func (wx *wxClient) GetQRCode(body *dto.GetQRCodeRequest) ([]byte, error) {
-	token, err := wx.GetStableAccessToken(false)
+func (wx *wxClient) GetQRCode(body *dto.GetQRCodeRequest) ([]byte, *utils.Response, error) {
+	token, _, err := wx.GetStableAccessToken(false)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	params := make(url.Values)
 	params.Add("access_token", token)
@@ -24,7 +24,7 @@ func (wx *wxClient) GetQRCode(body *dto.GetQRCodeRequest) ([]byte, error) {
 		Body:   body.ToByte(),
 	})
 	if result.ErrCode != 0 {
-		return nil, errors.New(result.ErrMsg)
+		return nil, response, errors.New(result.ErrMsg)
 	}
-	return response.Body, nil
+	return response.Body, response, nil
 }

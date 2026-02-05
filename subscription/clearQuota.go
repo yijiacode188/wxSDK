@@ -8,23 +8,23 @@ import (
 	"net/url"
 )
 
-func (wx *wxClient) ClearQuota(body *dto.ClearQuotaRequest) error {
-	token, err := wx.GetStableAccessToken(false)
+func (wx *wxClient) ClearQuota(body *dto.ClearQuotaRequest) (*utils.Response, error) {
+	token, _, err := wx.GetStableAccessToken(false)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	params := make(url.Values)
 	params.Add("access_token", token)
-	result, _, err := utils.HttpPost[vo.ClearQuotaResponse](&utils.RequestParams{
+	result, response, err := utils.HttpPost[vo.ClearQuotaResponse](&utils.RequestParams{
 		Url:    "https://api.weixin.qq.com/cgi-bin/clear_quota",
 		Params: params,
 		Body:   body.ToByte(),
 	})
 	if err != nil {
-		return err
+		return response, err
 	}
 	if result.ErrCode != 0 {
-		return errors.New(result.ErrMsg)
+		return response, errors.New(result.ErrMsg)
 	}
-	return nil
+	return response, nil
 }
