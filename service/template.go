@@ -2,14 +2,14 @@ package service
 
 import (
 	"errors"
-	"github.com/yijiacode188/wxSDK/service/hanlder/apimanage"
-	"github.com/yijiacode188/wxSDK/service/hanlder/base"
-	"github.com/yijiacode188/wxSDK/service/hanlder/custommenu"
-	"github.com/yijiacode188/wxSDK/service/hanlder/notifyAutoReplies"
-	"github.com/yijiacode188/wxSDK/service/hanlder/notifyMessage"
-	"github.com/yijiacode188/wxSDK/service/hanlder/notifyNotify"
-	"github.com/yijiacode188/wxSDK/service/hanlder/notifySubscribe"
-	"github.com/yijiacode188/wxSDK/service/hanlder/notifyTemplate"
+	"github.com/yijiacode188/wxSDK/service/handler/apimanage"
+	"github.com/yijiacode188/wxSDK/service/handler/base"
+	"github.com/yijiacode188/wxSDK/service/handler/custommenu"
+	"github.com/yijiacode188/wxSDK/service/handler/notifyAutoReplies"
+	"github.com/yijiacode188/wxSDK/service/handler/notifyMessage"
+	"github.com/yijiacode188/wxSDK/service/handler/notifyNotify"
+	"github.com/yijiacode188/wxSDK/service/handler/notifySubscribe"
+	"github.com/yijiacode188/wxSDK/service/handler/notifyTemplate"
 	"github.com/yijiacode188/wxSDK/store"
 	"github.com/yijiacode188/wxSDK/types"
 )

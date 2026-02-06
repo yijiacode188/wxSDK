@@ -6,6 +6,9 @@ import (
 	"github.com/yijiacode188/wxSDK/subscription/handler/apimanage"
 	"github.com/yijiacode188/wxSDK/subscription/handler/base"
 	"github.com/yijiacode188/wxSDK/subscription/handler/custommenu"
+	"github.com/yijiacode188/wxSDK/subscription/handler/notifyAutoReplies"
+	"github.com/yijiacode188/wxSDK/subscription/handler/notifyMessage"
+	"github.com/yijiacode188/wxSDK/subscription/handler/notifySubscribe"
 	"github.com/yijiacode188/wxSDK/types"
 )
 
@@ -13,6 +16,9 @@ type WxClient struct {
 	*base.Base
 	*apimanage.ApiManager
 	*custommenu.CustomMenu
+	*notifyAutoReplies.NotifyAutoReplies
+	*notifySubscribe.NotifySubscribe
+	*notifyMessage.NotifyMessage
 }
 
 // NewClient 初始化公众号客户端
@@ -48,10 +54,30 @@ func NewClient(appId, secret string, storeClient ...types.StoreInterface) (*WxCl
 		return nil, err
 	}
 
+	//基础消息与订阅通知 群发消息
+	notifyMessage, err := notifyMessage.NewNotifyMessage(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
+	//基础消息与订阅通知 一次性订阅消息
+	notifySubscribe, err := notifySubscribe.NewNotifyNotify(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
+	//基础消息与订阅通知 自动回复
+	notifyAutoReplies, err := notifyAutoReplies.NewNotifyAutoReplies(baseContext)
+	if err != nil {
+		return nil, err
+	}
 	wxClient := &WxClient{
-		Base:       baseContext,
-		ApiManager: apiManagerContext,
-		CustomMenu: customMenuContext,
+		Base:              baseContext,
+		ApiManager:        apiManagerContext,
+		CustomMenu:        customMenuContext,
+		NotifyMessage:     notifyMessage,
+		NotifySubscribe:   notifySubscribe,
+		NotifyAutoReplies: notifyAutoReplies,
 	}
 	return wxClient, nil
 }
