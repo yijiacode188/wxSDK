@@ -12,10 +12,11 @@ func main() {
 		return
 	}
 
-	result, _, err := client.GetSpeed()
+	result, _, err := client.GetCurrentAutoReplyInfo()
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
-	fmt.Println("创建成功", result)
+	fmt.Println("发送成功", result)
 }

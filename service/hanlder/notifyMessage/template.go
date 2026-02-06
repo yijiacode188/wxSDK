@@ -2,7 +2,7 @@ package notifyMessage
 
 import "github.com/yijiacode188/wxSDK/service/hanlder/base"
 
-// NotifyMessage 基础消息与订阅通知
+// NotifyMessage 基础消息与订阅通知 群发消息
 type NotifyMessage struct {
 	*base.Base
 }
