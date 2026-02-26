@@ -5,11 +5,17 @@ import (
 	"github.com/yijiacode188/wxSDK/service/handler/apimanage"
 	"github.com/yijiacode188/wxSDK/service/handler/base"
 	"github.com/yijiacode188/wxSDK/service/handler/custommenu"
+	"github.com/yijiacode188/wxSDK/service/handler/draftboxDraftmanage"
+	"github.com/yijiacode188/wxSDK/service/handler/draftboxShop"
+	"github.com/yijiacode188/wxSDK/service/handler/leaving"
+	"github.com/yijiacode188/wxSDK/service/handler/materialPermanent"
+	"github.com/yijiacode188/wxSDK/service/handler/materialTemporary"
 	"github.com/yijiacode188/wxSDK/service/handler/notifyAutoReplies"
 	"github.com/yijiacode188/wxSDK/service/handler/notifyMessage"
 	"github.com/yijiacode188/wxSDK/service/handler/notifyNotify"
 	"github.com/yijiacode188/wxSDK/service/handler/notifySubscribe"
 	"github.com/yijiacode188/wxSDK/service/handler/notifyTemplate"
+	"github.com/yijiacode188/wxSDK/service/handler/public"
 	"github.com/yijiacode188/wxSDK/store"
 	"github.com/yijiacode188/wxSDK/types"
 )
@@ -23,6 +29,12 @@ type WxClient struct {
 	*notifyNotify.NotifyNotify
 	*notifySubscribe.NotifySubscribe
 	*notifyAutoReplies.NotifyAutoReplies
+	*materialPermanent.MaterialPermanent
+	*materialTemporary.MaterialTemporary
+	*draftboxDraftmanage.DraftBoxDraftManage
+	*draftboxShop.DraftBoxShop
+	*leaving.Leaving
+	*public.Public
 }
 
 // NewClient 初始化服务号客户端
@@ -87,15 +99,55 @@ func NewClient(appId, secret string, storeClient ...types.StoreInterface) (*WxCl
 	if err != nil {
 		return nil, err
 	}
+
+	//素材管理 永久素材
+	materialPermanent, err := materialPermanent.NewMaterialPermanent(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
+	//素材管理 临时素材
+	materialTemporary, err := materialTemporary.NewMaterialTemporary(baseContext)
+	if err != nil {
+		return nil, err
+	}
+	// 草稿管理和商品卡片 草稿管理
+	draftBoxDraftManage, err := draftboxDraftmanage.NewDraftBoxDraftManage(baseContext)
+	if err != nil {
+		return nil, err
+	}
+	// 草稿管理和商品卡片 商品卡片
+	draftBoxShop, err := draftboxShop.NewDraftBoxShop(baseContext)
+	if err != nil {
+		return nil, err
+	}
+	// 留言管理
+	leaving, err := leaving.NewLeaving(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
+	// 发布能力
+	public, err := public.NewPublic(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
 	wxClient := &WxClient{
-		Base:              baseContext,
-		ApiManager:        apiManagerContext,
-		CustomMenu:        customMenuContext,
-		NotifyMessage:     notifyMessage,
-		NotifyTemplate:    notifyTemplate,
-		NotifyNotify:      notifyNotify,
-		NotifySubscribe:   notifySubscribe,
-		NotifyAutoReplies: notifyAutoReplies,
+		Base:                baseContext,
+		ApiManager:          apiManagerContext,
+		CustomMenu:          customMenuContext,
+		NotifyMessage:       notifyMessage,
+		NotifyTemplate:      notifyTemplate,
+		NotifyNotify:        notifyNotify,
+		NotifySubscribe:     notifySubscribe,
+		NotifyAutoReplies:   notifyAutoReplies,
+		MaterialPermanent:   materialPermanent,
+		MaterialTemporary:   materialTemporary,
+		DraftBoxDraftManage: draftBoxDraftManage,
+		DraftBoxShop:        draftBoxShop,
+		Leaving:             leaving,
+		Public:              public,
 	}
 
 	return wxClient, nil
