@@ -16,6 +16,10 @@ import (
 	"github.com/yijiacode188/wxSDK/service/handler/notifySubscribe"
 	"github.com/yijiacode188/wxSDK/service/handler/notifyTemplate"
 	"github.com/yijiacode188/wxSDK/service/handler/public"
+	"github.com/yijiacode188/wxSDK/service/handler/qrCodeQrCodeJump"
+	"github.com/yijiacode188/wxSDK/service/handler/qrCodeQrcodes"
+	"github.com/yijiacode188/wxSDK/service/handler/userManagerTag"
+	"github.com/yijiacode188/wxSDK/service/handler/userManagerUserInfo"
 	"github.com/yijiacode188/wxSDK/store"
 	"github.com/yijiacode188/wxSDK/types"
 )
@@ -35,6 +39,10 @@ type WxClient struct {
 	*draftboxShop.DraftBoxShop
 	*leaving.Leaving
 	*public.Public
+	*userManagerTag.UserManagerTag
+	*userManagerUserInfo.UserManagerUserInfo
+	*qrCodeQrCodeJump.QrCodeQrCodeJump
+	*qrCodeQrcodes.QrCodeQrCodes
 }
 
 // NewClient 初始化服务号客户端
@@ -133,6 +141,30 @@ func NewClient(appId, secret string, storeClient ...types.StoreInterface) (*WxCl
 		return nil, err
 	}
 
+	// 用户管理 标签管理
+	userManagerTag, err := userManagerTag.NewUserManagerTag(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
+	// 用户管理 用户信息
+	userManagerUserInfo, err := userManagerUserInfo.NewUserManagerUserInfo(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
+	// 服务号二维码 扫二维码打开小程序
+	qrCodeQrCodeJump, err := qrCodeQrCodeJump.NewQrCodeQrCodeJump(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
+	// 服务号二维码 带参二维码
+	qrCodeQrcodes, err := qrCodeQrcodes.NewQrCodeQrCodes(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
 	wxClient := &WxClient{
 		Base:                baseContext,
 		ApiManager:          apiManagerContext,
@@ -148,6 +180,10 @@ func NewClient(appId, secret string, storeClient ...types.StoreInterface) (*WxCl
 		DraftBoxShop:        draftBoxShop,
 		Leaving:             leaving,
 		Public:              public,
+		UserManagerTag:      userManagerTag,
+		UserManagerUserInfo: userManagerUserInfo,
+		QrCodeQrCodeJump:    qrCodeQrCodeJump,
+		QrCodeQrCodes:       qrCodeQrcodes,
 	}
 
 	return wxClient, nil
