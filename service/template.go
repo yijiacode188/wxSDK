@@ -7,6 +7,7 @@ import (
 	"github.com/yijiacode188/wxSDK/service/handler/custommenu"
 	"github.com/yijiacode188/wxSDK/service/handler/draftboxDraftmanage"
 	"github.com/yijiacode188/wxSDK/service/handler/draftboxShop"
+	"github.com/yijiacode188/wxSDK/service/handler/event"
 	"github.com/yijiacode188/wxSDK/service/handler/leaving"
 	"github.com/yijiacode188/wxSDK/service/handler/materialPermanent"
 	"github.com/yijiacode188/wxSDK/service/handler/materialTemporary"
@@ -15,11 +16,15 @@ import (
 	"github.com/yijiacode188/wxSDK/service/handler/notifyNotify"
 	"github.com/yijiacode188/wxSDK/service/handler/notifySubscribe"
 	"github.com/yijiacode188/wxSDK/service/handler/notifyTemplate"
+	"github.com/yijiacode188/wxSDK/service/handler/openPocAi"
 	"github.com/yijiacode188/wxSDK/service/handler/public"
 	"github.com/yijiacode188/wxSDK/service/handler/qrCodeQrCodeJump"
 	"github.com/yijiacode188/wxSDK/service/handler/qrCodeQrcodes"
+	"github.com/yijiacode188/wxSDK/service/handler/qrCodeShorten"
 	"github.com/yijiacode188/wxSDK/service/handler/userManagerTag"
 	"github.com/yijiacode188/wxSDK/service/handler/userManagerUserInfo"
+	"github.com/yijiacode188/wxSDK/service/handler/webDevAccess"
+	"github.com/yijiacode188/wxSDK/service/handler/webDevJssdk"
 	"github.com/yijiacode188/wxSDK/store"
 	"github.com/yijiacode188/wxSDK/types"
 )
@@ -43,10 +48,15 @@ type WxClient struct {
 	*userManagerUserInfo.UserManagerUserInfo
 	*qrCodeQrCodeJump.QrCodeQrCodeJump
 	*qrCodeQrcodes.QrCodeQrCodes
+	*qrCodeShorten.QrCodeShorten
+	*webDevAccess.WebDevAccess
+	*webDevJssdk.WebDevJsSdk
+	*openPocAi.OpenPocAi
+	*event.Event
 }
 
 // NewClient 初始化服务号客户端
-func NewClient(appId, secret string, storeClient ...types.StoreInterface) (*WxClient, error) {
+func NewClient(appId, secret, token string, encodingAESKey *string, storeClient ...types.StoreInterface) (*WxClient, error) {
 	if appId == "" {
 		return nil, errors.New("AppId不能为空")
 	}
@@ -61,7 +71,7 @@ func NewClient(appId, secret string, storeClient ...types.StoreInterface) (*WxCl
 	}
 
 	// 基础接口
-	baseContext, err := base.NewBase(appId, secret, storage)
+	baseContext, err := base.NewBase(appId, secret, token, encodingAESKey, storage)
 	if err != nil {
 		return nil, err
 	}
@@ -165,6 +175,36 @@ func NewClient(appId, secret string, storeClient ...types.StoreInterface) (*WxCl
 		return nil, err
 	}
 
+	// 服务号二维码 长消息与短消息
+	qrCodeShorten, err := qrCodeShorten.NewQrCodeShorten(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
+	// 网页开发 网页授权
+	webDevAccess, err := webDevAccess.NewWebDevAccess(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
+	// 网页开发 js-sdk
+	webDevJsSdk, err := webDevJssdk.NewWebDevJsSdk(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
+	// 智能接口 AI开放接口
+	openPocAi, err := openPocAi.NewOpenPocAi(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
+	// 微信消息通知
+	event, err := event.NewEvent(baseContext)
+	if err != nil {
+		return nil, err
+	}
+
 	wxClient := &WxClient{
 		Base:                baseContext,
 		ApiManager:          apiManagerContext,
@@ -184,6 +224,11 @@ func NewClient(appId, secret string, storeClient ...types.StoreInterface) (*WxCl
 		UserManagerUserInfo: userManagerUserInfo,
 		QrCodeQrCodeJump:    qrCodeQrCodeJump,
 		QrCodeQrCodes:       qrCodeQrcodes,
+		QrCodeShorten:       qrCodeShorten,
+		WebDevAccess:        webDevAccess,
+		WebDevJsSdk:         webDevJsSdk,
+		OpenPocAi:           openPocAi,
+		Event:               event,
 	}
 
 	return wxClient, nil

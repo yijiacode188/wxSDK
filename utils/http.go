@@ -38,7 +38,7 @@ func HttpGet[T any](params *RequestParams) (T, *Response, error) {
 		return result, nil, err
 	}
 
-	if strings.Contains("application/json", httpResp.Header.Get("Content-Type")) {
+	if strings.Contains(httpResp.Header.Get("Content-Type"), "application/json") {
 		// 解析响应体
 		if err := json.Unmarshal(httpResp.Body, &result); err != nil {
 			return result, httpResp, err
@@ -56,7 +56,8 @@ func HttpPost[T any](params *RequestParams) (T, *Response, error) {
 	if err != nil {
 		return result, nil, err
 	}
-	if strings.Contains("application/json", httpResp.Header.Get("Content-Type")) {
+
+	if strings.Contains(httpResp.Header.Get("Content-Type"), "application/json") {
 		// 解析响应体
 		if err := json.Unmarshal(httpResp.Body, &result); err != nil {
 			return result, httpResp, err

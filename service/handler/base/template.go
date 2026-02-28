@@ -6,13 +6,14 @@ import (
 )
 
 type Base struct {
-	AppId  string               `json:"appId"`
-	Secret string               `json:"secret"`
-	Token  string               `json:"token"`
-	Store  types.StoreInterface `json:"store"`
+	AppId          string               `json:"appId"`
+	Secret         string               `json:"secret"`
+	Token          string               `json:"token"`
+	EncodingAESKey *string              `json:"encodingAESKey"`
+	Store          types.StoreInterface `json:"store"`
 }
 
-func NewBase(appId, secret string, storeClient types.StoreInterface) (*Base, error) {
+func NewBase(appId, secret, token string, encodingAESKey *string, storeClient types.StoreInterface) (*Base, error) {
 	if appId == "" {
 		return nil, errors.New("AppId不能为空")
 	}
@@ -20,9 +21,11 @@ func NewBase(appId, secret string, storeClient types.StoreInterface) (*Base, err
 		return nil, errors.New("secret不能为空")
 	}
 	client := &Base{
-		AppId:  appId,
-		Secret: secret,
-		Store:  storeClient,
+		AppId:          appId,
+		Secret:         secret,
+		Token:          token,
+		Store:          storeClient,
+		EncodingAESKey: encodingAESKey,
 	}
 	return client, nil
 }
