@@ -1,47 +1,100 @@
 package event
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rand"
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/yijiacode188/wxSDK/service/handler/event/dto"
 	"github.com/yijiacode188/wxSDK/service/handler/event/vo"
+	"io"
 	"regexp"
 	"sort"
 )
 
 // EventMessage 微信推送的消息
-func (wx *Event) EventMessage(query *dto.EventMessageRequestQuery, body *dto.EventMessageBody) (*vo.EventMessageResponse, error) {
-	out := &vo.EventMessageResponse{}
+func (wx *Event) EventMessage(bodyData []byte, message MessageEvent) error {
+	messageData := &vo.EventMessageResponse{}
+	err := xml.Unmarshal(bodyData, messageData)
+	if err != nil {
+		return err
+	}
 	if wx.EncodingAESKey == nil {
 		//为明文模式
-		if !validateAuthPlainText(wx.Token, query.Timestamp, query.Nonce, query.Signature) {
-			return nil, errors.New("消息验证失败")
+		if !validateAuthPlainText(wx.Token, message.GetTimestamp(), message.GetNonce(), message.GetSignature()) {
+			return errors.New("消息验证失败")
 		}
-		out = &body.EventMessageResponse
 	} else {
 		//密文模式
-		if !validateAuthCiphertext(wx.Token, query.Timestamp, query.Nonce, body.Encrypt, query.MsgSignature) {
-			return nil, errors.New("消息验证失败")
+		if !validateAuthCiphertext(wx.Token, message.GetTimestamp(), message.GetNonce(), messageData.Encrypt, message.GetMsgSignature()) {
+			return errors.New("消息验证失败")
 		}
-		text, err := decodeCipherText(*wx.EncodingAESKey, body.Encrypt)
+		text, err := decodeCipherText(*wx.EncodingAESKey, messageData.Encrypt)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		xmlStr, err := extractXML(text)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		err = xml.Unmarshal([]byte(xmlStr), out)
+		err = xml.Unmarshal([]byte(xmlStr), messageData)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
-	return out, nil
+	//处理回调事件
+	switch messageData.MsgType {
+	case "text":
+		//普通消息
+		message.CallBackTextMessage(messageData.ToTextMsg())
+	case "image":
+		//图片消息
+		message.CallBackImageMessage(messageData.ToImageMsg())
+	case "voice":
+		//语音消息
+		message.CallBackVoiceMessage(messageData.ToVoiceMsg())
+	case "video":
+		//视频消息
+		message.CallBackVideoMessage(messageData.ToVideoMsg())
+	case "shortvideo":
+		//小视频消息
+		message.CallBackShortVideoMessage(messageData.ToShortVideoMsg())
+	case "location":
+		//地理位置消息
+		message.CallBackLocationMessage(messageData.ToLocationMsg())
+	case "link":
+		//链接消息
+		message.CallBackLinkMessage(messageData.ToLinkMsg())
+	case "event":
+		//事件通知
+		if messageData.Event == "subscribe" || messageData.Event == "unsubscribe" {
+			//订阅或取消订阅
+			message.CallBackSubscribeEvent(messageData.ToSubscribeEventMsg())
+		}
+		if messageData.Event == "SCAN" {
+			//扫码
+			message.CallBackScanEvent(messageData.ToScanEventMsg())
+		}
+		if messageData.Event == "LOCATION" {
+			//上报地理位置事件
+			message.CallBackLocationEvent(messageData.ToLocalEventMsg())
+		}
+		if messageData.Event == "CLICK" {
+			//点击菜单拉取消息时的事件推送
+			message.CallBackClickEvent(messageData.ToClickEventMsg())
+		}
+		if messageData.Event == "VIEW" {
+			//点击菜单跳转链接时的事件推送
+			message.CallBackViewEvent(messageData.ToViewEventMsg())
+		}
+	default:
+		return errors.New("不支持的消息类型")
+	}
+	return nil
 }
 
 // validateAuthPlainText 明文方式校验参数
@@ -88,6 +141,19 @@ func decodeCipherText(encodingAESKey, encrypt string) (string, error) {
 		return "", err
 	}
 	return result, nil
+}
+
+// encodeCipherText 加密
+func encodeCipherText(encodingAESKey, text string) (string, error) {
+	aesKey, err := base64.StdEncoding.DecodeString(encodingAESKey + "=")
+	if err != nil {
+		return "", err
+	}
+	tmpMsg, err := encryptAES128CBC(text, aesKey)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString([]byte(tmpMsg)), nil
 }
 
 // DecryptAES128CBC 解密AES-128-CBC加密的字符串
@@ -169,4 +235,54 @@ func extractXML(input string) (string, error) {
 	}
 
 	return xmlPart, nil
+}
+
+// EncryptAES128CBC 加密AES-128-CBC模式的字符串
+// plaintext: 待加密的明文
+// secretKey: 密钥（16字节）
+// 返回加密后的base64字符串
+func encryptAES128CBC(plaintext string, secretKey []byte) (string, error) {
+	// 1. 初始化AES密码块
+	block, err := aes.NewCipher(secretKey)
+	if err != nil {
+		return "", fmt.Errorf("AES初始化失败: %v", err)
+	}
+
+	// 2. 生成随机IV（16字节）
+	iv := make([]byte, aes.BlockSize)
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return "", fmt.Errorf("生成IV失败: %v", err)
+	}
+
+	// 3. PKCS7填充
+	paddedPlaintext := pkcs7Pad([]byte(plaintext), aes.BlockSize)
+
+	// 4. 创建CBC加密器
+	mode := cipher.NewCBCEncrypter(block, iv)
+
+	// 5. 加密
+	ciphertext := make([]byte, len(paddedPlaintext))
+	mode.CryptBlocks(ciphertext, paddedPlaintext)
+
+	// 6. 将IV和密文组合（IV放在前面，与解密对应）
+	finalData := append(iv, ciphertext...)
+
+	// 7. Base64编码
+	return base64.StdEncoding.EncodeToString(finalData), nil
+}
+
+// pkcs7Pad PKCS7填充
+func pkcs7Pad(data []byte, blockSize int) []byte {
+	if blockSize <= 0 {
+		return data
+	}
+
+	// 计算需要填充的长度
+	paddingLen := blockSize - len(data)%blockSize
+
+	// 创建填充字节（填充字节的值等于填充长度）
+	padding := bytes.Repeat([]byte{byte(paddingLen)}, paddingLen)
+
+	// 返回填充后的数据
+	return append(data, padding...)
 }
