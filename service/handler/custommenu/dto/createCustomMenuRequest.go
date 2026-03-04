@@ -2,7 +2,7 @@ package dto
 
 import (
 	"encoding/json"
-	"github.com/yijiacode188/wxSDK/subscription/consts"
+	"github.com/yijiacode188/wxSDK/service/consts"
 )
 
 type Button struct {
