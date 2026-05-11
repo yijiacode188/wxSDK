@@ -185,12 +185,12 @@ func decryptAES128CBC(encryptedStr string, secretKey []byte) (string, error) {
 	// 7. 解密（原地解密）
 	mode.CryptBlocks(ciphertext, ciphertext)
 	// 8. 去除PKCS7填充
-	plaintext, err := pkcs7Unpad(ciphertext, aes.BlockSize)
-	if err != nil {
-		return "", fmt.Errorf("去除填充失败: %v", err)
-	}
+	//plaintext, err := pkcs7Unpad(ciphertext, aes.BlockSize)
+	//if err != nil {
+	//	return "", fmt.Errorf("去除填充失败: %v", err)
+	//}
 
-	return string(plaintext), nil
+	return string(ciphertext), nil
 }
 
 // pkcs7Unpad 去除PKCS7填充
