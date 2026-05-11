@@ -2,6 +2,7 @@ package vo
 
 import (
 	"encoding/xml"
+	"fmt"
 	"github.com/yijiacode188/wxSDK/utils"
 )
 
@@ -44,7 +45,10 @@ type EventMessageResponse struct {
 // ToTextMsg 获取文本消息
 func (e *EventMessageResponse) ToTextMsg() *MessageText {
 	textMessage := &MessageText{}
-	utils.AssignByTag(e, textMessage, []string{}, "xml")
+	err := utils.AssignByTag(e, textMessage, []string{}, "xml")
+	if err != nil {
+		fmt.Println("出现了错误", err)
+	}
 	return textMessage
 }
 
