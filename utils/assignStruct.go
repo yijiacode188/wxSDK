@@ -31,7 +31,7 @@ func AssignByTag(src, dst interface{}, ignore []string, tag string) error {
 	for i := 0; i < srcVal.NumField(); i++ {
 		srcField := srcVal.Field(i)
 		srcFieldType := srcField.Type()
-		jsonTag := srcVal.Type().Field(i).Tag.Get("json")
+		jsonTag := srcVal.Type().Field(i).Tag.Get(tag)
 		if contains(ignore, jsonTag) {
 
 			continue
